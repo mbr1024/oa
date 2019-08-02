@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aynu.oa.desktop.news.dao.INewsLabelDao">
+
+	<resultMap type="NewsLabel" id="newsLabelMap">
+		<id column="id" property="id" />
+		<result column="label_name" property="name" />
+		<result column="label_content" property="content" />
+	</resultMap>
+
+	<select id="selectAllParents" resultMap="newsLabelMap">
+		select id, label_name,
+		label_content from newlabel where pid is null
+	</select>
+
+
+	<select id="selectNewsLabelById" resultMap="newsLabelMap2">
+		select id,
+		label_name, label_content, pid from newlabel where id=#{ooo}
+	</select>
+
+	<resultMap type="NewsLabel" id="newsLabelMap2">
+		<id column="id" property="id" />
+		<result column="label_name" property="name" />
+		<result column="label_content" property="content" />
+		<association property="parent" javaType="NewsLabel"
+			select="selectNewsLabelById" column="pid" />
+	</resultMap>
+	<select id="selectCurPageNewsLabels" resultMap="newsLabelMap2">
+		select id,
+		label_name, label_content, pid from newlabel
+		<if test="id != 0">
+			<where>
+				pid = #{id}
+			</where>
+		</if>
+		limit #{pageStartIndex},#{pageSize}
+	</select>
+	<select id="selectAllCount" resultType="int">
+		select count(*) from
+		newlabel
+		<if test="id != 0">
+			<where>
+				pid = #{id}
+			</where>
+		</if>
+	</select>
+
+	<delete id="deleteNewsLableById" >
+		delete from newlabel where id=#{id}
+	</delete>
+	<update id="updateNewsLabel">
+		update newlabel set
+		label_name=#{name},label_content=#{content},pid=#{parent.id} where
+		id=#{id}
+	</update>
+	<insert id="insertNewsLabel">
+		insert into newlabel (label_name,label_content,pid)
+		values(#{name},#{content},#{parent.id})
+	</insert>
+</mapper>
+
+
+
+
+
+
+
